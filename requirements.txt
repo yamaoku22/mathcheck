@@ -1,0 +1,4 @@
+streamlit
+daytona
+google-genai
+openai
