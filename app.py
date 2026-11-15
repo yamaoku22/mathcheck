@@ -50,6 +50,7 @@ textarea:focus{border-color:var(--accent)!important;box-shadow:none!important}
 .ans .lbl{font:500 .72rem 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--mute);text-transform:uppercase}
 .ans .val{font:700 1.7rem/1.25 'IBM Plex Mono',monospace;color:var(--text);margin-top:6px;word-break:break-word}
 .ans .box.hl{border-color:var(--accent)} .ans .box.hl .val{color:var(--accent)}
+.sec{font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--mute);text-transform:uppercase;margin:18px 0 6px}
 .verdict{border-radius:6px;padding:14px 18px;margin:6px 0 10px;font:500 1rem 'IBM Plex Sans',sans-serif;border:1px solid var(--line);background:var(--panel)}
 .verdict.ok{border-left:4px solid var(--accent)}
 .verdict.ng{border-left:4px solid #ff5a5a}
@@ -101,7 +102,7 @@ def extract_code(text):
     return m.group(1).strip() if m else ""
 
 SYSTEM = """あなたは高校数学・物理の講師です。次の形式で答えてください。
-1. わかりやすい解説。最後の行は「最終答え: ...」
+1. 解き方の解説。「**Step 1**」「**Step 2**」…と番号を付け、各ステップで何をするかを一言書いてから途中式を省略せずに書く。数式は $...$（独立した式は $$...$$）で書く。最後の行は「最終答え: ...」（ここだけは $ を使わない）
 2. 解説のあとに、次の2行を必ず書く（グラフにできない問題なら FUNC: NONE）
 FUNC: 問題の関数を x の式で書く。係数は a, b, c などの文字に一般化する。べき乗は **、掛け算の * は省略しない
 PARAMS: 各文字のこの問題での値（例: a=1, b=-4, c=3）
@@ -247,9 +248,14 @@ if R:
         st.markdown("<div class='verdict ng'><b>Mismatch.</b>&nbsp; AIの答えが実際の計算と一致しません。右の計算結果が正しい答えです。</div>", unsafe_allow_html=True)
         st.markdown(R["verdict"])
 
-    tabs = st.tabs(["解説 / Explanation", "グラフ / Graph", "採点 / Grading", "検算コード / Code"])
+    st.markdown("<div class='sec'>解き方・途中式 / Step-by-step solution</div>", unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown(R["explanation"])
+        st.caption(f"AI engine: {R['engine']}")
 
-    with tabs[1]:
+    tabs = st.tabs(["グラフ / Graph", "採点 / Grading", "検算コード / Code"])
+
+    with tabs[0]:
         expr = safe_expr(R["func"])
         if expr is None:
             st.info("この問題はグラフにできませんでした。/ No plottable function for this problem.")
@@ -315,11 +321,7 @@ if R:
                 for label, rx, ry in special:
                     st.caption(f"{label}: ({rx:.3g}, {ry:.3g})")
 
-    with tabs[0]:
-        st.markdown(R["explanation"])
-        st.caption(f"AI engine: {R['engine']}")
-
-    with tabs[3]:
+    with tabs[2]:
         st.caption("このコードは Daytona の隔離サンドボックスで実際に実行されました / Executed in an isolated Daytona sandbox")
         for i, c in enumerate(R["codes"], 1):
             with st.expander(f"attempt {i}", expanded=(i == len(R["codes"]))):
@@ -327,7 +329,7 @@ if R:
         st.markdown("**Output**")
         st.code(R["output"])
 
-    with tabs[2]:
+    with tabs[1]:
         if R["grade"] is None:
             st.info("途中式を入力すると、どのステップで間違えたかを採点します。/ Paste your working to get graded.")
         elif R["grade"].strip().startswith("正解"):
