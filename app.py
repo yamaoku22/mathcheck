@@ -59,6 +59,12 @@ textarea:focus{border-color:var(--accent)!important;box-shadow:none!important}
 .stTabs [data-baseweb="tab-highlight"]{background:var(--accent)}
 [data-testid="stMetric"]{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 16px}
 [data-testid="stMetricValue"]{color:var(--text);font-family:'IBM Plex Mono',monospace}
+@media (max-width:640px){
+  .hero h1{font-size:2.3rem}
+  .ans{grid-template-columns:1fr}
+  .ans .val{font-size:1.35rem}
+  .term{font-size:.74rem;padding:10px 12px;overflow-x:auto}
+}
 </style>
 """, unsafe_allow_html=True)
 
