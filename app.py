@@ -1,4 +1,4 @@
-import os, re, time
+import os, re, time, html
 import numpy as np
 import sympy as sp
 import plotly.graph_objects as go
@@ -45,6 +45,11 @@ textarea:focus{border-color:var(--accent)!important;box-shadow:none!important}
 .pipe{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px}
 .chip{padding:5px 12px;border:1px solid var(--line);border-radius:4px;font:500 .75rem 'IBM Plex Mono',monospace;color:var(--mute)}
 .chip b{color:var(--accent)}
+.ans{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 6px}
+.ans .box{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 20px}
+.ans .lbl{font:500 .72rem 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--mute);text-transform:uppercase}
+.ans .val{font:700 1.7rem/1.25 'IBM Plex Mono',monospace;color:var(--text);margin-top:6px;word-break:break-word}
+.ans .box.hl{border-color:var(--accent)} .ans .box.hl .val{color:var(--accent)}
 .verdict{border-radius:6px;padding:14px 18px;margin:6px 0 10px;font:500 1rem 'IBM Plex Sans',sans-serif;border:1px solid var(--line);background:var(--panel)}
 .verdict.ok{border-left:4px solid var(--accent)}
 .verdict.ng{border-left:4px solid #ff5a5a}
@@ -227,15 +232,24 @@ if R:
     st.markdown("<div class='pipe'><span class='chip'><b>01</b> EXPLAIN</span>"
                 "<span class='chip'><b>02</b> EXECUTE · DAYTONA</span><span class='chip'><b>03</b> VERIFY</span></div>",
                 unsafe_allow_html=True)
-    if R["verdict"].strip().startswith("一致"):
-        st.markdown("<div class='verdict ok'><b>Verified.</b>&nbsp; 解説の答えは、実際の計算結果と一致しました。</div>", unsafe_allow_html=True)
+    ok = R["verdict"].strip().startswith("一致")
+    m1 = re.search(r"(?:最終答え|Final answer)\s*[:：]\s*(.+)", R["explanation"], re.I)
+    m2 = re.search(r"ANSWER:\s*(.+)", R["output"] or "")
+    ai_ans = m1.group(1).strip() if m1 else "—"
+    real_ans = m2.group(1).strip() if m2 else (R["output"] or "—").strip()[:80]
+    st.markdown(f"""<div class='ans'>
+<div class='box'><div class='lbl'>AIの答え / AI answer</div><div class='val'>{html.escape(ai_ans)}</div></div>
+<div class='box hl'><div class='lbl'>Daytonaで計算した答え / Computed</div><div class='val'>{html.escape(real_ans)}</div></div>
+</div>""", unsafe_allow_html=True)
+    if ok:
+        st.markdown("<div class='verdict ok'><b>Verified.</b>&nbsp; 2つの答えが一致しました。この解説は信頼できます。</div>", unsafe_allow_html=True)
     else:
-        st.markdown("<div class='verdict ng'><b>Mismatch.</b>&nbsp; 解説の答えが、実際の計算結果と一致しません。</div>", unsafe_allow_html=True)
+        st.markdown("<div class='verdict ng'><b>Mismatch.</b>&nbsp; AIの答えが実際の計算と一致しません。右の計算結果が正しい答えです。</div>", unsafe_allow_html=True)
         st.markdown(R["verdict"])
 
-    tabs = st.tabs(["グラフ / Graph", "解説 / Explanation", "検算コード / Code", "採点 / Grading"])
+    tabs = st.tabs(["解説 / Explanation", "グラフ / Graph", "採点 / Grading", "検算コード / Code"])
 
-    with tabs[0]:
+    with tabs[1]:
         expr = safe_expr(R["func"])
         if expr is None:
             st.info("この問題はグラフにできませんでした。/ No plottable function for this problem.")
@@ -301,11 +315,11 @@ if R:
                 for label, rx, ry in special:
                     st.caption(f"{label}: ({rx:.3g}, {ry:.3g})")
 
-    with tabs[1]:
+    with tabs[0]:
         st.markdown(R["explanation"])
         st.caption(f"AI engine: {R['engine']}")
 
-    with tabs[2]:
+    with tabs[3]:
         st.caption("このコードは Daytona の隔離サンドボックスで実際に実行されました / Executed in an isolated Daytona sandbox")
         for i, c in enumerate(R["codes"], 1):
             with st.expander(f"attempt {i}", expanded=(i == len(R["codes"]))):
@@ -313,7 +327,7 @@ if R:
         st.markdown("**Output**")
         st.code(R["output"])
 
-    with tabs[3]:
+    with tabs[2]:
         if R["grade"] is None:
             st.info("途中式を入力すると、どのステップで間違えたかを採点します。/ Paste your working to get graded.")
         elif R["grade"].strip().startswith("正解"):
