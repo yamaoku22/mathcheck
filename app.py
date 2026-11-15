@@ -22,7 +22,7 @@ def ask_llm(messages):
     from google import genai
     client = genai.Client(api_key=secret("GEMINI_API_KEY"))
     prompt = "\n\n".join(f"[{m['role']}]\n{m['content']}" for m in messages)
-    r = client.models.generate_content(model="gemini-3.5-flash-light", contents=prompt)
+    r = client.models.generate_content(model="gemini-3.5-flash-lite", contents=prompt)
     return r.text, "Gemini"
 
 def extract_code(text):
