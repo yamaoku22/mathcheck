@@ -123,7 +123,7 @@ def extract_code(text):
     return m.group(1).strip() if m else ""
 
 SYSTEM = """あなたは高校数学・物理の講師です。次の形式で答えてください。
-1. 解き方の解説。「**Step 1**」「**Step 2**」…と番号を付け、各ステップで何をするかを一言書いてから途中式を省略せずに書く。数式は $...$（独立した式は $$...$$）で書く。最後の行は「最終答え: ...」（ここだけは $ を使わない）
+1. 解き方の解説。「**Step 1**」「**Step 2**」…と番号を付け、各ステップで何をするかを一言書いてから途中式を省略せずに書く。数式は $ で囲んで書く。一番最後の行に、最終答え: に続けて答えだけを $ を使わずに書く（例 → 最終答え: x = 1, 2, 3）
 2. 解説のあとに、次の2行を必ず書く（グラフにできない問題なら FUNC: NONE）
 FUNC: 問題の関数を x の式で書く。係数は a, b, c などの文字に一般化する。べき乗は **、掛け算の * は省略しない
 PARAMS: 各文字のこの問題での値（例: a=1, b=-4, c=3）
@@ -258,9 +258,10 @@ if R:
                 "<span class='chip'><b>02</b> EXECUTE · DAYTONA</span><span class='chip'><b>03</b> VERIFY</span></div>",
                 unsafe_allow_html=True)
     ok = R["verdict"].strip().startswith("一致")
-    m1 = re.search(r"(?:最終答え|Final answer)\s*[:：]\s*(.+)", R["explanation"], re.I)
+    cands = [a.strip().strip("$「」。") for a in re.findall(r"(?:最終答え|Final answer)\s*[:：]\s*(.+)", R["explanation"], re.I)]
+    cands = [a for a in cands if a and "..." not in a and "…" not in a and "例" not in a and "ここだけ" not in a]
     m2 = re.search(r"ANSWER:\s*(.+)", R["output"] or "")
-    ai_ans = m1.group(1).strip() if m1 else "—"
+    ai_ans = cands[-1] if cands else "—"
     real_ans = m2.group(1).strip() if m2 else (R["output"] or "—").strip()[:80]
     st.markdown(f"""<div class='ans'>
 <div class='box'><div class='lbl'>AIの答え / AI answer</div><div class='val'>{html.escape(ai_ans)}</div></div>
