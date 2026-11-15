@@ -67,12 +67,24 @@ NOSANA_URL = secret("NOSANA_URL")      # 設定すればNosana上のAIを使う
 NOSANA_MODEL = secret("NOSANA_MODEL")
 GEMINI_MODEL = "gemini-3.5-flash-lite"
 
+def nosana_client():
+    from openai import OpenAI
+    url = NOSANA_URL.rstrip("/")
+    if not url.endswith("/v1"):
+        url += "/v1"
+    return OpenAI(base_url=url, api_key=secret("NOSANA_API_KEY") or "nosana", timeout=90)
+
+@st.cache_resource
+def nosana_model():
+    return NOSANA_MODEL or nosana_client().models.list().data[0].id
+
 def ask_llm(messages):
     if NOSANA_URL:
-        from openai import OpenAI
-        client = OpenAI(base_url=NOSANA_URL, api_key="nosana")
-        r = client.chat.completions.create(model=NOSANA_MODEL, messages=messages)
-        return r.choices[0].message.content, "Nosana"
+        try:  # Nosana の分散GPU上のオープンモデルを優先
+            r = nosana_client().chat.completions.create(model=nosana_model(), messages=messages)
+            return r.choices[0].message.content, f"Nosana · {nosana_model()}"
+        except Exception:
+            pass  # 落ちていても Gemini に自動フォールバック
     from google import genai
     client = genai.Client(api_key=secret("GEMINI_API_KEY"))
     prompt = "\n\n".join(f"[{m['role']}]\n{m['content']}" for m in messages)
