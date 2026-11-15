@@ -25,7 +25,13 @@ A wrong explanation is worse than no explanation — it teaches the mistake.
 5. **Judge** — the explanation's final answer is compared with the computed result:
    - ✅ **Verified** — answer matches real computation
    - ⚠️ **Mismatch** — warns the student and shows the corrected answer
-6. **Grade the student** — the student can paste their own answer / working; it is graded against the *computed* ground truth, and MathCheck points out **which step** went wrong.
+6. **Interactive graph** — the AI generalizes the function (e.g. `a*x**2 + b*x + c`); students drag coefficient sliders, substitute any `x`, and see the value, slope and tangent line live, with roots and extrema marked.
+7. **Live sandbox terminal** — a real-time log shows every Daytona step (sandbox created → code executed → exit code → sandbox destroyed), so users *see* the proof happen.
+8. **Photo input & bilingual** — snap a textbook problem; explanations in Japanese or English.
+9. **Grade the student** — the student can paste their own answer / working; it is graded against the *computed* ground truth, and MathCheck points out **which step** went wrong.
+
+## Stack
+Python · Streamlit · Plotly · SymPy · Daytona SDK · google-genai · OpenAI-compatible client (Nosana)
 
 ## How sponsor products are used (code-level)
 
@@ -64,7 +70,6 @@ On Streamlit Community Cloud, set the same keys in **Secrets**.
 
 ## What's next
 
-- Photo input (snap a textbook problem)
 - Graph rendering from the sandbox for functions / physics motion
 - Tutor dashboard: log which problem types the AI gets wrong most often
 - Run the explanation model fully on Nosana for low-cost school deployments

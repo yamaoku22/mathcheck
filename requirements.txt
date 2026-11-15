@@ -2,3 +2,6 @@ streamlit
 daytona
 google-genai
 openai
+plotly
+sympy
+numpy
