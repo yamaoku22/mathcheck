@@ -78,7 +78,7 @@ def nosana_client():
     url = NOSANA_URL.rstrip("/")
     if not url.endswith("/v1"):
         url += "/v1"
-    return OpenAI(base_url=url, api_key=secret("NOSANA_API_KEY") or "nosana", timeout=90)
+    return OpenAI(base_url=url, api_key=secret("NOSANA_API_KEY") or "nosana", timeout=240)
 
 @st.cache_resource
 def nosana_model():
@@ -89,8 +89,8 @@ def ask_llm(messages):
         try:  # Nosana の分散GPU上のオープンモデルを優先
             r = nosana_client().chat.completions.create(model=nosana_model(), messages=messages)
             return r.choices[0].message.content, f"Nosana · {nosana_model()}"
-        except Exception:
-            pass  # 落ちていても Gemini に自動フォールバック
+        except Exception as e:  # 落ちていても Gemini に自動フォールバック
+            st.session_state["nosana_err"] = f"{type(e).__name__}: {str(e)[:120]}"
     from google import genai
     client = genai.Client(api_key=secret("GEMINI_API_KEY"))
     prompt = "\n\n".join(f"[{m['role']}]\n{m['content']}" for m in messages)
@@ -173,12 +173,15 @@ if go_btn:
 
     messages = [{"role": "system", "content": SYSTEM + f"\n解説は必ず{lang}で書くこと。"},
                 {"role": "user", "content": q}]
-    step("llm: generating explanation + verification code ...")
+    step(f"llm: generating explanation + verification code ... ({'Nosana GPU network' if NOSANA_URL else 'Gemini'})")
     reply, engine = ask_llm(messages)
     func_str, params = parse_meta(reply)
     explanation = re.sub(r"```python.*?```", "", reply, flags=re.S)
     explanation = re.sub(r"^\s*(FUNC|PARAMS):.*$", "", explanation, flags=re.M).strip()
     step(f"llm: <span class='ok'>OK</span> ({engine})", "ok")
+    if engine == "Gemini":
+        why = "NOSANA_URL not set" if not NOSANA_URL else html.escape(st.session_state.get("nosana_err", "unknown"))
+        step(f"nosana: <span class='warn'>fallback to Gemini</span> → {why}", "warn")
 
     step("daytona: creating isolated sandbox ...")
     t0 = time.time()
