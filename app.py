@@ -10,50 +10,49 @@ st.set_page_config(page_title="MathCheck", page_icon="✅", layout="wide")
 # ───────────────────────── デザイン ─────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap');
-.stApp{
-  background:
-    radial-gradient(900px 500px at 0% -10%, rgba(99,102,241,.35), transparent 60%),
-    radial-gradient(800px 500px at 110% 0%, rgba(6,182,212,.30), transparent 55%),
-    linear-gradient(rgba(148,163,184,.06) 1px, transparent 1px) 0 0/40px 40px,
-    linear-gradient(90deg, rgba(148,163,184,.06) 1px, transparent 1px) 0 0/40px 40px,
-    #070b16;
-  color:#e2e8f0; font-family:'Inter',sans-serif;
-}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{--bg:#0c0d0f;--panel:#141518;--line:#26282d;--text:#e8e6e1;--mute:#8b8d93;--accent:#d4ff3a}
+.stApp{background:
+  linear-gradient(var(--line) 1px, transparent 1px) 0 0/48px 48px,
+  linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0/48px 48px, var(--bg);
+  background-blend-mode:normal;color:var(--text);font-family:'IBM Plex Sans',sans-serif}
+.stApp::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at center, transparent 40%, var(--bg) 85%);pointer-events:none}
 [data-testid="stHeader"]{background:transparent}
-h1,h2,h3,h4,p,li,label,span,[data-testid="stWidgetLabel"] p{color:#e2e8f0}
-.hero{padding:18px 0 6px}
-.hero .badge{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;
-  border:1px solid rgba(103,232,249,.35);background:rgba(8,47,73,.45);color:#67e8f9;
-  font:600 .78rem 'JetBrains Mono',monospace;letter-spacing:.08em}
-.hero .dot{width:8px;height:8px;border-radius:50%;background:#22d3ee;box-shadow:0 0 10px #22d3ee;animation:pulse 1.6s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-.hero h1{font-size:3.6rem;font-weight:800;margin:.25rem 0 0;line-height:1.05;
-  background:linear-gradient(90deg,#67e8f9,#a78bfa,#f472b6,#67e8f9);background-size:300% 100%;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 8s linear infinite}
-@keyframes flow{to{background-position:300% 0}}
-.hero p{color:#94a3b8;font-size:1.1rem;margin:.4rem 0 0}
-textarea{background:rgba(15,23,42,.75)!important;color:#e2e8f0!important;border:1px solid #1e293b!important;
-  border-radius:14px!important;font-family:'JetBrains Mono',monospace!important}
-textarea:focus{border-color:#22d3ee!important;box-shadow:0 0 0 1px #22d3ee,0 0 22px rgba(34,211,238,.25)!important}
-[data-testid="stFileUploaderDropzone"]{background:rgba(15,23,42,.6);border:1px dashed #334155;border-radius:14px}
-.stButton>button{background:linear-gradient(90deg,#06b6d4,#8b5cf6);color:#fff;border:0;border-radius:14px;
-  padding:.7rem 1.6rem;font-weight:800;letter-spacing:.03em;box-shadow:0 0 28px rgba(139,92,246,.45);transition:.2s}
-.stButton>button:hover{transform:translateY(-1px);box-shadow:0 0 40px rgba(34,211,238,.55);color:#fff}
-.term{background:#020617;border:1px solid #1e293b;border-radius:14px;padding:14px 16px;
-  font:400 .86rem/1.6 'JetBrains Mono',monospace;color:#94a3b8;box-shadow:inset 0 0 30px rgba(34,211,238,.06)}
-.term .ok{color:#4ade80}.term .run{color:#22d3ee}.term .warn{color:#fbbf24}
-.term .cursor{display:inline-block;width:8px;height:14px;background:#22d3ee;vertical-align:middle;animation:pulse 1s infinite}
-.pipe{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 14px}
-.chip{padding:7px 14px;border-radius:999px;font:600 .8rem 'JetBrains Mono',monospace;
-  background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.45);color:#86efac}
-.verdict{border-radius:16px;padding:16px 20px;margin:6px 0 10px;font-weight:700;font-size:1.05rem}
-.verdict.ok{background:linear-gradient(90deg,rgba(34,197,94,.18),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.5);color:#bbf7d0}
-.verdict.ng{background:linear-gradient(90deg,rgba(244,63,94,.18),rgba(244,63,94,.04));border:1px solid rgba(244,63,94,.5);color:#fecdd3}
-.stTabs [data-baseweb="tab"]{color:#94a3b8;font-weight:600}
-.stTabs [aria-selected="true"]{color:#67e8f9!important}
-[data-testid="stMetric"]{background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:14px;padding:12px 16px}
-[data-testid="stMetricValue"]{color:#67e8f9;font-family:'JetBrains Mono',monospace}
+h1,h2,h3,h4,p,li,label,span,[data-testid="stWidgetLabel"] p{color:var(--text)}
+[data-testid="stWidgetLabel"] p{font:500 .78rem 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.hero{padding:22px 0 10px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.hero .badge{font:500 .75rem 'IBM Plex Mono',monospace;color:var(--mute);letter-spacing:.1em}
+.hero .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.hero h1{font:700 3.2rem/1.05 'IBM Plex Sans',sans-serif;letter-spacing:-.02em;margin:.4rem 0 0;color:var(--text)}
+.hero h1 b{color:var(--accent)}
+.hero p{color:var(--mute);font-size:1rem;margin:.5rem 0 0}
+textarea{background:var(--panel)!important;color:var(--text)!important;border:1px solid var(--line)!important;
+  border-radius:6px!important;font-family:'IBM Plex Mono',monospace!important}
+textarea:focus{border-color:var(--accent)!important;box-shadow:none!important}
+[data-testid="stFileUploaderDropzone"]{background:var(--panel);border:1px dashed #3a3d43;border-radius:6px}
+[data-testid="stFileUploaderDropzone"] *{color:var(--text)!important}
+[data-testid="stFileUploaderDropzone"] small,[data-testid="stFileUploaderDropzone"] span{color:var(--mute)!important}
+[data-testid="stFileUploaderDropzone"] button{background:#1d1f23!important;border:1px solid #3a3d43!important;color:var(--text)!important;border-radius:6px}
+.stButton>button{background:var(--accent);color:#0c0d0f;border:0;border-radius:6px;padding:.7rem 1.4rem;
+  font:700 .9rem 'IBM Plex Mono',monospace;letter-spacing:.04em}
+.stButton>button:hover{background:#e6ff7a;color:#0c0d0f}
+.stButton>button p{color:#0c0d0f}
+.term{background:#08090a;border:1px solid var(--line);border-radius:6px;padding:14px 16px;
+  font:400 .84rem/1.65 'IBM Plex Mono',monospace;color:var(--mute)}
+.term .ok{color:var(--accent)}.term .run{color:var(--text)}.term .warn{color:#ffb547}
+.term .cursor{display:inline-block;width:8px;height:14px;background:var(--accent);vertical-align:middle;animation:pulse 1s infinite}
+.pipe{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px}
+.chip{padding:5px 12px;border:1px solid var(--line);border-radius:4px;font:500 .75rem 'IBM Plex Mono',monospace;color:var(--mute)}
+.chip b{color:var(--accent)}
+.verdict{border-radius:6px;padding:14px 18px;margin:6px 0 10px;font:500 1rem 'IBM Plex Sans',sans-serif;border:1px solid var(--line);background:var(--panel)}
+.verdict.ok{border-left:4px solid var(--accent)}
+.verdict.ng{border-left:4px solid #ff5a5a}
+.stTabs [data-baseweb="tab"]{color:var(--mute);font:500 .85rem 'IBM Plex Mono',monospace}
+.stTabs [aria-selected="true"]{color:var(--text)!important}
+.stTabs [data-baseweb="tab-highlight"]{background:var(--accent)}
+[data-testid="stMetric"]{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 16px}
+[data-testid="stMetricValue"]{color:var(--text);font-family:'IBM Plex Mono',monospace}
 </style>
 """, unsafe_allow_html=True)
 
@@ -120,9 +119,9 @@ def terminal(box, lines, running=True):
 
 # ───────────────────────── 画面：入力 ─────────────────────────
 st.markdown("""<div class='hero'>
-<span class='badge'><span class='dot'></span>LIVE · DAYTONA SANDBOX VERIFIED</span>
-<h1>MathCheck</h1>
-<p>AIの解説を、実際に計算して証明する。&nbsp;/&nbsp; AI math explanations, proven by real code execution.</p>
+<span class='badge'><span class='dot'></span>VERIFIED IN DAYTONA SANDBOXES</span>
+<h1>Math<b>Check</b></h1>
+<p>AIの解説を、実際に計算して確かめる。 — Every answer is checked by running real code.</p>
 </div>""", unsafe_allow_html=True)
 
 left, right = st.columns([3, 2], gap="large")
@@ -132,8 +131,8 @@ with left:
                            placeholder="例:\ny = (x - 2)^2 - 4 + 3\n= (x - 2)^2 + 1\n頂点 (2, 1)", height=120)
 with right:
     lang = st.radio("Language / 言語", ["日本語", "English"], horizontal=True)
-    photo = st.file_uploader("📷 問題の写真 / Photo (optional)", type=["png", "jpg", "jpeg"])
-    go_btn = st.button("⚡ 解説＋検算する / Explain & Verify", width="stretch")
+    photo = st.file_uploader("問題の写真 / Photo (optional)", type=["png", "jpg", "jpeg"])
+    go_btn = st.button("解説＋検算する  →", width="stretch")
 
 # ───────────────────────── 処理 ─────────────────────────
 if go_btn:
@@ -213,16 +212,16 @@ R = st.session_state.get("result")
 if R:
     if not go_btn:
         terminal(st, R["log"], running=False)
-    st.markdown("<div class='pipe'><span class='chip'>① AI EXPLAIN ✓</span>"
-                "<span class='chip'>② DAYTONA EXECUTE ✓</span><span class='chip'>③ VERIFY ✓</span></div>",
+    st.markdown("<div class='pipe'><span class='chip'><b>01</b> EXPLAIN</span>"
+                "<span class='chip'><b>02</b> EXECUTE · DAYTONA</span><span class='chip'><b>03</b> VERIFY</span></div>",
                 unsafe_allow_html=True)
     if R["verdict"].strip().startswith("一致"):
-        st.markdown("<div class='verdict ok'>✅ VERIFIED — 解説の答えは実際の計算結果と一致しました</div>", unsafe_allow_html=True)
+        st.markdown("<div class='verdict ok'><b>Verified.</b>&nbsp; 解説の答えは、実際の計算結果と一致しました。</div>", unsafe_allow_html=True)
     else:
-        st.markdown("<div class='verdict ng'>⚠️ MISMATCH — 解説の答えが計算結果と一致しません</div>", unsafe_allow_html=True)
+        st.markdown("<div class='verdict ng'><b>Mismatch.</b>&nbsp; 解説の答えが、実際の計算結果と一致しません。</div>", unsafe_allow_html=True)
         st.markdown(R["verdict"])
 
-    tabs = st.tabs(["📈 インタラクティブグラフ", "📘 解説", "🧪 Daytona検算", "📝 採点"])
+    tabs = st.tabs(["グラフ / Graph", "解説 / Explanation", "検算コード / Code", "採点 / Grading"])
 
     with tabs[0]:
         expr = safe_expr(R["func"])
@@ -232,7 +231,7 @@ if R:
             syms = sorted([s for s in expr.free_symbols if s != X], key=str)
             vals = {}
             if syms:
-                st.caption("🎛️ 係数を動かして、グラフがどう変わるか確かめよう / Drag the coefficients")
+                st.caption("係数を動かして、グラフの変化を確かめる / Drag the coefficients")
                 cols = st.columns(len(syms))
                 for i, s in enumerate(syms):
                     v0 = R["params"].get(str(s), 1.0)
@@ -240,7 +239,7 @@ if R:
                     vals[s] = cols[i].slider(str(s), float(v0 - span), float(v0 + span), float(v0), 0.1,
                                              key=f"p_{s}_{R['run']}")
             f = sp.simplify(expr.subs(vals))
-            x0 = st.slider("🎯 x に代入する値 / substitute x =", -10.0, 10.0, 0.0, 0.1, key=f"x0_{R['run']}")
+            x0 = st.slider("x に代入する値 / substitute x", -10.0, 10.0, 0.0, 0.1, key=f"x0_{R['run']}")
 
             fx = sp.lambdify(X, f, "numpy")
             dfx = sp.lambdify(X, sp.diff(f, X), "numpy")
@@ -254,15 +253,15 @@ if R:
 
             fig = go.Figure()
             fig.add_trace(go.Scatter(x=xs, y=ys, mode="lines", name="f(x)",
-                                     line=dict(color="#22d3ee", width=3)))
+                                     line=dict(color="#d4ff3a", width=2.5)))
             if np.isfinite(y0) and np.isfinite(slope):
                 fig.add_trace(go.Scatter(x=xs, y=y0 + slope * (xs - x0), mode="lines", name="接線 / tangent",
-                                         line=dict(color="#a78bfa", width=1.5, dash="dash")))
+                                         line=dict(color="#8b8d93", width=1.2, dash="dash")))
                 fig.add_trace(go.Scatter(x=[x0], y=[y0], mode="markers", name=f"x = {x0}",
-                                         marker=dict(size=14, color="#f472b6", line=dict(color="#fff", width=2))))
+                                         marker=dict(size=12, color="#0c0d0f", line=dict(color="#d4ff3a", width=2.5))))
             special = []
             if f.is_polynomial(X) and sp.degree(f, X) >= 1:
-                for label, poly, color in [("解 / root", f, "#4ade80"), ("頂点・極値 / extremum", sp.diff(f, X), "#fbbf24")]:
+                for label, poly, color in [("解 / root", f, "#e8e6e1"), ("頂点・極値 / extremum", sp.diff(f, X), "#ffb547")]:
                     if sp.degree(poly, X) >= 1:
                         for r in sp.Poly(poly, X).nroots():
                             if abs(sp.im(r)) < 1e-9 and -10 <= float(sp.re(r)) <= 10:
@@ -275,10 +274,10 @@ if R:
                 lo, hi = np.percentile(finite, [2, 98]); pad = (hi - lo) * 0.15 + 1
                 fig.update_yaxes(range=[lo - pad, hi + pad])
             fig.update_layout(template="plotly_dark", height=460, margin=dict(l=10, r=10, t=10, b=10),
-                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(2,6,23,.6)",
+                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#101114",
                               legend=dict(orientation="h", y=1.02, x=0))
-            fig.update_xaxes(zeroline=True, zerolinecolor="#475569", gridcolor="#1e293b")
-            fig.update_yaxes(zeroline=True, zerolinecolor="#475569", gridcolor="#1e293b")
+            fig.update_xaxes(zeroline=True, zerolinecolor="#4a4d53", gridcolor="#1c1e22")
+            fig.update_yaxes(zeroline=True, zerolinecolor="#4a4d53", gridcolor="#1c1e22")
 
             g1, g2 = st.columns([3, 1])
             with g1:
@@ -288,7 +287,7 @@ if R:
                 st.metric(f"f({x0})", f"{y0:.4g}" if np.isfinite(y0) else "—")
                 st.metric(f"傾き f'({x0}) / slope", f"{slope:.4g}" if np.isfinite(slope) else "—")
                 for label, rx, ry in special:
-                    st.caption(f"◆ {label}: ({rx:.3g}, {ry:.3g})")
+                    st.caption(f"{label}: ({rx:.3g}, {ry:.3g})")
 
     with tabs[1]:
         st.markdown(R["explanation"])
